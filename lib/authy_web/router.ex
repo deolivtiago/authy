@@ -7,6 +7,8 @@ defmodule AuthyWeb.Router do
 
   scope "/api", AuthyWeb do
     pipe_through :api
+
+    resources "/users", UserController, except: [:new, :edit]
   end
 
   # Enables LiveDashboard only for development
