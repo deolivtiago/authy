@@ -3,6 +3,7 @@ defmodule AuthyWeb.UserController do
 
   alias Authy.Accounts
   alias Authy.Accounts.User
+  alias AuthyWeb.Auth.Guardian
 
   action_fallback AuthyWeb.FallbackController
 
@@ -12,11 +13,12 @@ defmodule AuthyWeb.UserController do
   end
 
   def create(conn, %{"user" => user_params}) do
-    with {:ok, %User{} = user} <- Accounts.create_user(user_params) do
+    with {:ok, %User{} = user} <- Accounts.create_user(user_params),
+         {:ok, token, _claims} <- Guardian.encode_and_sign(user) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", Routes.user_path(conn, :show, user))
-      |> render("show.json", user: user)
+      |> render("show.json", %{user: user, token: token})
     end
   end
 
@@ -38,6 +40,14 @@ defmodule AuthyWeb.UserController do
 
     with {:ok, %User{}} <- Accounts.delete_user(user) do
       send_resp(conn, :no_content, "")
+    end
+  end
+
+  def signin(conn, %{"user" => user_params}) do
+    with {:ok, token} <- Guardian.authenticate(user_params) do
+      conn
+      |> put_status(:ok)
+      |> render("signin.json", token: token)
     end
   end
 end

@@ -17,6 +17,11 @@ config :authy, AuthyWeb.Endpoint,
   pubsub_server: Authy.PubSub,
   live_view: [signing_salt: "ITDOGj+z"]
 
+# Configures the authentication with Guardian
+config :authy, AuthyWeb.Auth.Guardian,
+  issuer: "authy",
+  secret_key: "ERnmLRtpJa4uuo0y9TAxHrGtc8uCA+1ljEYW3OGn0lruMiIaqg5VvIXSyd+rumR7"
+
 # Configures the mailer
 #
 # By default it uses the "Local" adapter which stores the emails

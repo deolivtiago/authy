@@ -5,8 +5,19 @@ defmodule AuthyWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :auth do
+    plug AuthyWeb.Auth.Pipeline
+  end
+
   scope "/api", AuthyWeb do
     pipe_through :api
+
+    post "/signup", UserController, :create
+    post "/signin", UserController, :signin
+  end
+
+  scope "/api", AuthyWeb do
+    pipe_through [:api, :auth]
 
     resources "/users", UserController, except: [:new, :edit]
   end
